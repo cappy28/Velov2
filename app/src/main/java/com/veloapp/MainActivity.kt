@@ -1,25 +1,30 @@
 package com.veloapp
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.media.AudioManager
+import android.media.session.MediaSessionManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
@@ -34,15 +39,25 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var mapView: MapView
     private lateinit var locationManager: LocationManager
     private lateinit var audioManager: AudioManager
+    private lateinit var mediaSessionManager: MediaSessionManager
+
     private lateinit var tvSpeed: TextView
     private lateinit var tvDistance: TextView
     private lateinit var tvDuration: TextView
     private lateinit var tvAvgSpeed: TextView
     private lateinit var tvCalories: TextView
-    private lateinit var tvSongInfo: TextView
+    private lateinit var tvSongTitle: TextView
+    private lateinit var tvArtistName: TextView
+    private lateinit var tvAlbumName: TextView
+    private lateinit var ivAlbumArt: ImageView
+    private lateinit var btnPlayPause: ImageButton
+    private lateinit var btnPrev: ImageButton
+    private lateinit var btnNext: ImageButton
+    private lateinit var musicPanel: View
     private lateinit var musicVisualizerView: MusicVisualizerView
     private lateinit var btnDownloadZone: ImageButton
     private lateinit var tvDownloadStatus: TextView
+
     private var startTime: Long = 0
     private var isTracking = false
     private var totalDistance = 0.0
@@ -68,22 +83,57 @@ class MainActivity : AppCompatActivity(), LocationListener {
         Configuration.getInstance().load(this, getPreferences(Context.MODE_PRIVATE))
         Configuration.getInstance().userAgentValue = packageName
         setContentView(R.layout.activity_main)
+
         mapView = findViewById(R.id.mapView)
         tvSpeed = findViewById(R.id.tvSpeed)
         tvDistance = findViewById(R.id.tvDistance)
         tvDuration = findViewById(R.id.tvDuration)
         tvAvgSpeed = findViewById(R.id.tvAvgSpeed)
         tvCalories = findViewById(R.id.tvCalories)
-        tvSongInfo = findViewById(R.id.tvSongInfo)
+        tvSongTitle = findViewById(R.id.tvSongTitle)
+        tvArtistName = findViewById(R.id.tvArtistName)
+        tvAlbumName = findViewById(R.id.tvAlbumName)
+        ivAlbumArt = findViewById(R.id.ivAlbumArt)
+        btnPlayPause = findViewById(R.id.btnPlayPause)
+        btnPrev = findViewById(R.id.btnPrev)
+        btnNext = findViewById(R.id.btnNext)
+        musicPanel = findViewById(R.id.musicPanel)
         musicVisualizerView = findViewById(R.id.musicVisualizer)
         btnDownloadZone = findViewById(R.id.btnDownloadZone)
         tvDownloadStatus = findViewById(R.id.tvDownloadStatus)
-        mapView.setTileSource(TileSourceFactory.MAPNIK)
+
+        // Carte satellite ESRI (gratuite, sans clé API)
+        val satelliteSource = object : XYTileSource(
+            "ESRI_Satellite", 1, 19, 256, ".jpg",
+            arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/")
+        ) {
+            override fun getTileURLString(pMapTileIndex: Long): String {
+                return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" +
+                        MapTileIndex.getY(pMapTileIndex) + "/" +
+                        MapTileIndex.getX(pMapTileIndex)
+            }
+        }
+        mapView.setTileSource(satelliteSource)
         mapView.setMultiTouchControls(true)
         mapView.controller.setZoom(17.0)
+
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        mediaSessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
+
         btnDownloadZone.setOnClickListener { downloadZoneAroundMe() }
+        btnPlayPause.setOnClickListener {
+            val ctrl = MusicNotificationListener.currentController
+            if (ctrl != null) {
+                if (MusicNotificationListener.isPlaying) ctrl.transportControls.pause()
+                else ctrl.transportControls.play()
+            }
+        }
+        btnPrev.setOnClickListener { MusicNotificationListener.currentController?.transportControls?.skipToPrevious() }
+        btnNext.setOnClickListener { MusicNotificationListener.currentController?.transportControls?.skipToNext() }
+
+        MusicNotificationListener.onMusicUpdate = { runOnUiThread { updateMusicUI() } }
+
         timerRunnable = object : Runnable {
             override fun run() {
                 if (isTracking) {
@@ -101,20 +151,62 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 handler.postDelayed(this, 1000)
             }
         }
+
         musicRunnable = object : Runnable {
             override fun run() {
-                val playing = audioManager.isMusicActive
-                musicVisualizerView.setPlaying(playing)
-                if (!playing) tvSongInfo.text = "🎵 Aucune musique"
-                else if (tvSongInfo.text == "🎵 Aucune musique") tvSongInfo.text = "🎵 En cours de lecture…"
-                handler.postDelayed(this, 500)
+                if (isNotificationListenerEnabled()) {
+                    MusicNotificationListener.refreshFromSessions(
+                        mediaSessionManager,
+                        ComponentName(this@MainActivity, MusicNotificationListener::class.java)
+                    )
+                    musicVisualizerView.setPlaying(MusicNotificationListener.isPlaying)
+                } else {
+                    musicVisualizerView.setPlaying(audioManager.isMusicActive)
+                }
+                handler.postDelayed(this, 1000)
             }
         }
+
+        if (!isNotificationListenerEnabled()) {
+            Toast.makeText(this, "Autorise l'accès aux notifications pour afficher la musique", Toast.LENGTH_LONG).show()
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST)
         else startTracking()
+    }
+
+    private fun isNotificationListenerEnabled(): Boolean {
+        val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners") ?: return false
+        return flat.contains(packageName)
+    }
+
+    private fun updateMusicUI() {
+        val title = MusicNotificationListener.songTitle
+        val artist = MusicNotificationListener.artistName
+        val album = MusicNotificationListener.albumName
+        val art = MusicNotificationListener.albumArt
+        val playing = MusicNotificationListener.isPlaying
+
+        if (title.isEmpty() && artist.isEmpty()) {
+            tvSongTitle.text = "Aucune musique"
+            tvArtistName.text = ""
+            tvAlbumName.text = ""
+            ivAlbumArt.setImageResource(android.R.drawable.ic_media_play)
+        } else {
+            tvSongTitle.text = title.ifEmpty { "Titre inconnu" }
+            tvArtistName.text = artist
+            tvAlbumName.text = album
+            if (art != null) ivAlbumArt.setImageBitmap(art)
+            else ivAlbumArt.setImageResource(android.R.drawable.ic_media_play)
+        }
+        btnPlayPause.setImageResource(
+            if (playing) android.R.drawable.ic_media_pause
+            else android.R.drawable.ic_media_play
+        )
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -160,10 +252,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     private fun downloadZoneAroundMe() {
         val center = lastLocation
-        if (center == null) {
-            Toast.makeText(this, "⏳ GPS pas encore fixé…", Toast.LENGTH_LONG).show()
-            return
-        }
+        if (center == null) { Toast.makeText(this, "⏳ GPS pas encore fixé…", Toast.LENGTH_LONG).show(); return }
         tvDownloadStatus.text = "⬇️ Calcul des tuiles…"
         tvDownloadStatus.visibility = View.VISIBLE
         btnDownloadZone.isEnabled = false
@@ -178,8 +267,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
                     val xMax = floor((bbox.lonEast + 180.0) / 360.0 * (1 shl zoom)).toInt()
                     val yMin = floor((1.0 - ln(tan(Math.toRadians(bbox.latNorth)) + 1.0 / cos(Math.toRadians(bbox.latNorth))) / Math.PI) / 2.0 * (1 shl zoom)).toInt()
                     val yMax = floor((1.0 - ln(tan(Math.toRadians(bbox.latSouth)) + 1.0 / cos(Math.toRadians(bbox.latSouth))) / Math.PI) / 2.0 * (1 shl zoom)).toInt()
-                    for (x in xMin..xMax) for (y in yMin..yMax)
-                        allTiles.add(MapTileIndex.getTileIndex(zoom, x, y))
+                    for (x in xMin..xMax) for (y in yMin..yMax) allTiles.add(MapTileIndex.getTileIndex(zoom, x, y))
                 }
                 val total = allTiles.size
                 handler.post { tvDownloadStatus.text = "⬇️ 0 / $total tuiles…" }
@@ -194,10 +282,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
                     handler.postDelayed({ tvDownloadStatus.visibility = View.GONE }, 5000)
                 }
             } catch (e: Exception) {
-                handler.post {
-                    tvDownloadStatus.text = "❌ Erreur — vérifie ta connexion"
-                    btnDownloadZone.isEnabled = true
-                }
+                handler.post { tvDownloadStatus.text = "❌ Erreur"; btnDownloadZone.isEnabled = true }
             }
         }.start()
     }
