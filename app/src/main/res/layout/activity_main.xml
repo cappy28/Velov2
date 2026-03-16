@@ -9,64 +9,96 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Stats en haut -->
+    <!-- STATS EN HAUT (2 lignes) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:background="#D9000010"
         android:elevation="6dp"
-        android:orientation="horizontal"
-        android:paddingStart="8dp" android:paddingTop="10dp"
-        android:paddingEnd="8dp" android:paddingBottom="10dp">
+        android:orientation="vertical">
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <TextView android:id="@+id/tvDistance" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="0.00 km"
-                android:textColor="#FFFFFF" android:textSize="17sp" android:textStyle="bold"/>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="distance" android:textColor="#88AACCFF" android:textSize="10sp"/>
+        <!-- Ligne 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="8dp" android:paddingTop="8dp"
+            android:paddingEnd="8dp" android:paddingBottom="4dp">
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <TextView android:id="@+id/tvDistance" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="0.00 km"
+                    android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="distance" android:textColor="#88AACCFF" android:textSize="9sp"/>
+            </LinearLayout>
+
+            <View android:layout_width="1dp" android:layout_height="30dp"
+                android:layout_gravity="center_vertical" android:background="#33FFFFFF"/>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <TextView android:id="@+id/tvDuration" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="00:00:00"
+                    android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="durée" android:textColor="#88AACCFF" android:textSize="9sp"/>
+            </LinearLayout>
+
+            <View android:layout_width="1dp" android:layout_height="30dp"
+                android:layout_gravity="center_vertical" android:background="#33FFFFFF"/>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <TextView android:id="@+id/tvAvgSpeed" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="0.0 km/h"
+                    android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="moy." android:textColor="#88AACCFF" android:textSize="9sp"/>
+            </LinearLayout>
+
+            <View android:layout_width="1dp" android:layout_height="30dp"
+                android:layout_gravity="center_vertical" android:background="#33FFFFFF"/>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <TextView android:id="@+id/tvCalories" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="0 kcal"
+                    android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="calories" android:textColor="#88AACCFF" android:textSize="9sp"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <View android:layout_width="1dp" android:layout_height="36dp"
-            android:layout_gravity="center_vertical" android:background="#33FFFFFF"/>
+        <!-- Ligne 2 : altitude, max speed, météo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="12dp" android:paddingBottom="6dp" android:paddingEnd="12dp">
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <TextView android:id="@+id/tvDuration" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="00:00:00"
-                android:textColor="#FFFFFF" android:textSize="17sp" android:textStyle="bold"/>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="durée" android:textColor="#88AACCFF" android:textSize="10sp"/>
-        </LinearLayout>
+            <TextView android:id="@+id/tvAltitude"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="-- m alt." android:textColor="#88FFCCAA" android:textSize="11sp"/>
 
-        <View android:layout_width="1dp" android:layout_height="36dp"
-            android:layout_gravity="center_vertical" android:background="#33FFFFFF"/>
+            <TextView android:id="@+id/tvMaxSpeed"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0 km/h max" android:textColor="#88FFAAAA" android:textSize="11sp"/>
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <TextView android:id="@+id/tvAvgSpeed" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="0.0 km/h"
-                android:textColor="#FFFFFF" android:textSize="17sp" android:textStyle="bold"/>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="moy." android:textColor="#88AACCFF" android:textSize="10sp"/>
-        </LinearLayout>
-
-        <View android:layout_width="1dp" android:layout_height="36dp"
-            android:layout_gravity="center_vertical" android:background="#33FFFFFF"/>
-
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <TextView android:id="@+id/tvCalories" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="0 kcal"
-                android:textColor="#FFFFFF" android:textSize="17sp" android:textStyle="bold"/>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="calories" android:textColor="#88AACCFF" android:textSize="10sp"/>
+            <TextView android:id="@+id/tvWeather"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="🌡️ --°C" android:textColor="#88AAFFCC" android:textSize="11sp"/>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Bouton télécharger zone -->
+    <!-- BOUTONS DROITE (télécharger + historique) -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -75,6 +107,17 @@
         android:orientation="vertical"
         android:gravity="center"
         android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnHistory"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/music_panel_bg"
+            android:padding="10dp"
+            android:src="@android:drawable/ic_menu_recent_history"
+            android:contentDescription="Historique"/>
+
+        <View android:layout_width="1dp" android:layout_height="10dp"/>
 
         <ImageButton
             android:id="@+id/btnDownloadZone"
@@ -87,7 +130,7 @@
 
         <TextView
             android:id="@+id/tvDownloadStatus"
-            android:layout_width="140dp"
+            android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:background="@drawable/music_panel_bg"
@@ -95,11 +138,11 @@
             android:padding="6dp"
             android:text=""
             android:textColor="#FFFFFF"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:visibility="gone"/>
     </LinearLayout>
 
-    <!-- Panneau musique (bas gauche) -->
+    <!-- PANNEAU MUSIQUE (bas gauche) -->
     <LinearLayout
         android:id="@+id/musicPanel"
         android:layout_width="220dp"
@@ -111,108 +154,88 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <!-- Ligne du haut : pochette + infos -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <ImageView
-                android:id="@+id/ivAlbumArt"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
+            <ImageView android:id="@+id/ivAlbumArt"
+                android:layout_width="52dp" android:layout_height="52dp"
                 android:scaleType="centerCrop"
                 android:background="@drawable/speed_circle_bg"/>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginStart="8dp"
                 android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvSongTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Aucune musique"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
-
-                <TextView
-                    android:id="@+id/tvArtistName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="#AACCFF"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
-
-                <TextView
-                    android:id="@+id/tvAlbumName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="#6688AA"
-                    android:textSize="10sp"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
+                <TextView android:id="@+id/tvSongTitle" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="Aucune musique"
+                    android:textColor="#FFFFFF" android:textSize="12sp" android:textStyle="bold"
+                    android:maxLines="1" android:ellipsize="end"/>
+                <TextView android:id="@+id/tvArtistName" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text=""
+                    android:textColor="#AACCFF" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end"/>
+                <TextView android:id="@+id/tvAlbumName" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text=""
+                    android:textColor="#6688AA" android:textSize="10sp"
+                    android:maxLines="1" android:ellipsize="end"/>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Contrôles musique -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/btnPrev"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_media_previous"
-                android:tint="#FFFFFF"
-                android:contentDescription="Précédent"/>
-
-            <ImageButton
-                android:id="@+id/btnPlayPause"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/speed_circle_bg"
-                android:src="@android:drawable/ic_media_play"
-                android:tint="#FFFFFF"
-                android:padding="8dp"
-                android:contentDescription="Play/Pause"/>
-
-            <ImageButton
-                android:id="@+id/btnNext"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_media_next"
-                android:tint="#FFFFFF"
-                android:contentDescription="Suivant"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:gravity="center" android:orientation="horizontal">
+            <ImageButton android:id="@+id/btnPrev" android:layout_width="36dp" android:layout_height="36dp"
+                android:background="@android:color/transparent" android:src="@android:drawable/ic_media_previous"
+                android:tint="#FFFFFF" android:contentDescription="Précédent"/>
+            <ImageButton android:id="@+id/btnPlayPause" android:layout_width="44dp" android:layout_height="44dp"
+                android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
+                android:background="@drawable/speed_circle_bg" android:src="@android:drawable/ic_media_play"
+                android:tint="#FFFFFF" android:padding="8dp" android:contentDescription="Play/Pause"/>
+            <ImageButton android:id="@+id/btnNext" android:layout_width="36dp" android:layout_height="36dp"
+                android:background="@android:color/transparent" android:src="@android:drawable/ic_media_next"
+                android:tint="#FFFFFF" android:contentDescription="Suivant"/>
         </LinearLayout>
 
-        <!-- Visualiseur -->
-        <com.veloapp.MusicVisualizerView
-            android:id="@+id/musicVisualizer"
-            android:layout_width="match_parent"
-            android:layout_height="28dp"
+        <com.veloapp.MusicVisualizerView android:id="@+id/musicVisualizer"
+            android:layout_width="match_parent" android:layout_height="28dp"
             android:layout_marginTop="6dp"/>
     </LinearLayout>
 
-    <!-- Cercle vitesse (bas droite) -->
+    <!-- BOUTONS PAUSE / STOP (au dessus du cercle vitesse) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="22dp"
+        android:layout_marginBottom="138dp"
+        android:orientation="horizontal"
+        android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnPauseResume"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:background="@drawable/music_panel_bg"
+            android:src="@android:drawable/ic_media_pause"
+            android:tint="#FFFFFF"
+            android:padding="8dp"
+            android:contentDescription="Pause"/>
+
+        <View android:layout_width="8dp" android:layout_height="1dp"/>
+
+        <ImageButton
+            android:id="@+id/btnStop"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:background="@drawable/music_panel_bg"
+            android:src="@android:drawable/ic_delete"
+            android:tint="#FF5555"
+            android:padding="8dp"
+            android:contentDescription="Stop"/>
+    </LinearLayout>
+
+    <!-- CERCLE VITESSE (bas droite) -->
     <FrameLayout
         android:layout_width="110dp"
         android:layout_height="110dp"
@@ -220,28 +243,13 @@
         android:layout_margin="14dp"
         android:background="@drawable/speed_circle_bg"
         android:elevation="8dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvSpeed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="#FFFFFF"
-                android:textSize="38sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="km/h"
-                android:textColor="#88AACCFF"
-                android:textSize="11sp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+            android:gravity="center" android:orientation="vertical">
+            <TextView android:id="@+id/tvSpeed" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="0"
+                android:textColor="#FFFFFF" android:textSize="38sp" android:textStyle="bold"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="km/h" android:textColor="#88AACCFF" android:textSize="11sp"/>
         </LinearLayout>
     </FrameLayout>
 
